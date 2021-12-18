@@ -66,49 +66,7 @@ def register(chat_id, status=None, subject=None, course=None):
         return "Ошибка добавления в БД"
 
 
-# def delete_teach_group(chat_id):
-#     try:
-#         if Users.query.filter_by(chat_id=chat_id).all()[0].id is not None:
-#             id = Users.query.filter_by(chat_id=chat_id).all()[0].id
-#             Users.query.filter_by(id=id).delete()
-#             db.session.commit()
-#     except:
-#         db.session.rollback()
-#         print("Ошибка удаления из БД")
-#
-#
-# def subscribe(chat_id, time, group=None, teacher=None):
-#     try:
-#         if group is not None:
-#             notification = Notification_group(chat_id=chat_id, group=group, time=time)
-#             db.session.add(notification)
-#         if teacher is not None:
-#             notification = Notification_teacher(chat_id=chat_id, teacher=teacher, time=time)
-#             db.session.add(notification)
-#         db.session.flush()
-#         db.session.commit()
-#     except:
-#         db.session.rollback()
-#         print("Ошибка добавления в БД")
 
-
-# def unsubscribe(chat_id, group=None, teacher=None):
-#     try:
-#         if group is not None:
-#             notification = Notification_group.query.filter_by(chat_id=chat_id).all()
-#             for i in range(len(Notification_group.query.filter_by(chat_id=chat_id).all())):
-#                 if notification[i].group == group:
-#                     Notification_group.query.filter_by(id=notification[i].id).delete()
-#                     db.session.commit()
-#         if teacher is not None:
-#             notification = Notification_teacher.query.filter_by(chat_id=chat_id).all()
-#             for i in range(len(Notification_teacher.query.filter_by(chat_id=chat_id).all())):
-#                 if notification[i].teacher == teacher:
-#                     Notification_teacher.query.filter_by(id=notification[i].id).delete()
-#                     db.session.commit()
-#     except:
-#         db.session.rollback()
-#         print("Ошибка удаления из БД")
 
 
 if __name__ == '__main__':
