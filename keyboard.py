@@ -17,13 +17,15 @@ def main_menu():
 
 def all_questions_answer(data=None):
     questions = InlineKeyboardMarkup(row_width=2)
-    development = InlineKeyboardButton("Разработка", callback_data=data)
-    testing = InlineKeyboardButton("Тестирование", callback_data=data)
-    analytics = InlineKeyboardButton("Аналитика", callback_data=data)
-    administration = InlineKeyboardButton("Администрирование", callback_data=data)
-    information_security = InlineKeyboardButton("Информационная безопасноть", callback_data=data)
-    design = InlineKeyboardButton("Дизайн", callback_data="dev")
+    development = InlineKeyboardButton("Разработка", callback_data="category"+data)
+    testing = InlineKeyboardButton("Тестирование", callback_data="category"+data)
+    analytics = InlineKeyboardButton("Аналитика", callback_data="category"+data)
+    administration = InlineKeyboardButton("Администрирование", callback_data="category"+data)
+    information_security = InlineKeyboardButton("Информационная безопасноть", callback_data="category"+data)
+    design = InlineKeyboardButton("Дизайн", callback_data="category"+data)
+    formulation = InlineKeyboardButton("Описание категории", callback_data="category"+data)
     questions.add(development, testing,analytics, administration, information_security, design)
+    questions.row(formulation)
     return questions
 
 
