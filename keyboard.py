@@ -1,43 +1,5 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 
-
-def choose_status():
-    status = InlineKeyboardMarkup(row_width=2)
-    mentee = InlineKeyboardButton("Менти", callback_data="status_student")
-    mentor = InlineKeyboardButton("Ментор", callback_data="status_teacher")
-    status.add(mentee, mentor)
-    return status
-
-
-def choose_course():
-    courses = InlineKeyboardMarkup(row_width=1)
-    back = InlineKeyboardButton("Назад", callback_data="status_back")
-    array = [1, 2, 3, 4]
-    courses.add(back)
-    for course in array:
-        courses.add(InlineKeyboardButton(course, callback_data=f"status_{course}"))
-    confirm = InlineKeyboardButton("Подтвердить", callback_data="status_confirm")
-    courses.add(confirm)
-    return courses
-
-
-def choose_subject(course):
-    subjects = InlineKeyboardMarkup(row_width=1)
-    back = InlineKeyboardButton("Назад", callback_data=f"status_back-menu")
-    if course == 1:
-        array = ["Математика", "Информатика"]
-    if course == 2:
-        array = ["Основы веб технологий", "Операционные системы"]
-    if course == 3:
-        array = ["ООП", "Операционные системы"]
-    if course == 4:
-        array = ["Английский язык", "БЖД"]
-    subjects.add(back)
-    for subject in array:
-        subjects.add(InlineKeyboardButton(subject, callback_data=f"status_{subject}"))
-    return subjects
-
-
 def main_menu():
     fourm = InlineKeyboardButton(text="Фоурм")
     ask_a_question = InlineKeyboardButton(text="Задать вопрос")
