@@ -10,22 +10,23 @@ def main_menu():
     my_questions = InlineKeyboardButton(text="Мои вопросы")
     my_answers = InlineKeyboardButton(text="Мои ответы")
     rating = InlineKeyboardButton(text="Рейтинг")
+    main_menu = InlineKeyboardButton(text="Меню")
     menu = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2).add(ask_a_question, my_questions,
                                                                       answer_the_questions,
                                                                       my_answers,
-                                                                      fourm, rating)
+                                                                      fourm, rating, main_menu)
     return menu
 
 
-def all_questions_answer(data=None):
+def all_questions_answer(action=None):
     questions = InlineKeyboardMarkup(row_width=2)
-    development = InlineKeyboardButton("Разработка", callback_data="category_"+"разработка_"+data)
-    testing = InlineKeyboardButton("Тестирование", callback_data="category_"+data)
-    analytics = InlineKeyboardButton("Аналитика", callback_data="category_"+data)
-    administration = InlineKeyboardButton("Администрирование", callback_data="category_"+data)
-    information_security = InlineKeyboardButton("Информационная безопасноть", callback_data="category_"+data)
-    design = InlineKeyboardButton("Дизайн", callback_data="category_"+data)
-    formulation = InlineKeyboardButton("Описание категории", callback_data="category_"+data)
+    development = InlineKeyboardButton("Разработка", callback_data="category_разработка_"+action)
+    testing = InlineKeyboardButton("Тестирование", callback_data="category_тестирование_"+action)
+    analytics = InlineKeyboardButton("Аналитика", callback_data="category_аналитика_"+action)
+    administration = InlineKeyboardButton("Администрирование", callback_data="category_администрирование_"+action)
+    information_security = InlineKeyboardButton("Информационная \nбезопасноть", callback_data="category_иб_"+action)
+    design = InlineKeyboardButton("Дизайн", callback_data="category_дизайн_"+action)
+    formulation = InlineKeyboardButton("Описание категории", callback_data="category_"+action)
     questions.add(development, testing,analytics, administration, information_security, design)
     questions.row(formulation)
     return questions

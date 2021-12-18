@@ -52,6 +52,24 @@ def generation_message(chat_id_applicant, category, title, message, status):
         print("Ошибка добавления в БД")
 
 
+def message_add(chat_id_applicant, tittle=None, message=None, status=None):
+    # try:
+        if tittle is not None:
+            Message.query.filter_by(chat_id_applicant=chat_id_applicant, title="none").all()[0].title = tittle
+            db.session.flush()
+            db.session.commit()
+        if message is not None:
+            Message.query.filter_by(chat_id_applicant=chat_id_applicant, message="none").all()[0].message = message
+            db.session.flush()
+            db.session.commit()
+        if status is not None:
+            Message.query.filter_by(chat_id_applicant=chat_id_applicant, status="none").all()[0].status = status
+            db.session.flush()
+            db.session.commit()
+    # except:
+        db.session.rollback()
+        print("Ошибка добавления в БД")
+
 def delete_message(title, chat_id_applicant):
     try:
         Message.query.filter_by(title=title, chat_id_applicant=chat_id_applicant).delete()
