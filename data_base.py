@@ -29,13 +29,48 @@ class Stage(db.Model):
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    chat_id_applicant = db.Column(db.Integer)
     chat_id_respondent = db.Column(db.Integer)
-    chat_id_recipient = db.Column(db.Integer)
+    category = db.Column(db.String(50))
     title = db.Column(db.String(50))
     message = db.Column(db.String(500))
     like = db.Column(db.Integer, default=0)
     dislike = db.Column(db.Integer, default=0)
     status = db.Column(db.String(10))
+
+
+def generation_message(chat_id_applicant, category, title, message, status):
+    try:
+        message = Message(chat_id_applicant=chat_id_applicant,
+                          category=category, title=title,
+                          message=message, status=status)
+        db.session.add(message)
+        db.session.flush()
+        db.session.commit()
+    except:
+        db.session.rollback()
+        print("Ошибка добавления в БД")
+
+
+def delete_message(title, chat_id_applicant):
+    try:
+        Message.query.filter_by(title=title, chat_id_applicant=chat_id_applicant).delete()
+        db.session.flush()
+        db.session.commit()
+    except:
+        db.session.rollback()
+        print("Ошибка удаления из БД")
+
+
+def reg_stage(chat_id, stage):
+    try:
+        stage = Stage(chat_id=chat_id, stage=stage)
+        db.session.add(stage)
+        db.session.flush()
+        db.session.commit()
+    except:
+        db.session.rollback()
+        print("Ошибка добавления в БД")
 
 
 def stage(chat_id, stage):

@@ -1,4 +1,5 @@
 from data_base import *
+''' Вывод рейтинга пользователей '''
 
 
 def rating():
