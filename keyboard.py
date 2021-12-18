@@ -4,7 +4,7 @@ import data_base
 
 
 def main_menu():
-    fourm = InlineKeyboardButton(text="Фоурм")
+    fourm = InlineKeyboardButton(text="Форум")
     ask_a_question = InlineKeyboardButton(text="Задать вопрос")
     answer_the_questions = InlineKeyboardButton(text="Ответить на вопросы")
     my_questions = InlineKeyboardButton(text="Мои вопросы")
@@ -47,6 +47,13 @@ def user_questions(chat_id_applicant):
         questions.add(InlineKeyboardButton(item[0], callback_data="questions_"+item[0]))
     return questions
 
+
+def user_all_questions(category):
+    questions = InlineKeyboardMarkup(row_width=2)
+    message_title = data_base.Message.query.filter_by(category=category).with_entities(data_base.Message.title).all()
+    for item in message_title:
+        questions.add(InlineKeyboardButton(item[0], callback_data="questions_"+item[0]))
+    return questions
 
 def delete_message(title):
     message = InlineKeyboardMarkup(row_width=1)

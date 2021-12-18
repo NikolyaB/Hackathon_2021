@@ -53,7 +53,7 @@ def generation_message(chat_id_applicant, category, title, message, status):
 
 
 def message_add(chat_id_applicant, tittle=None, message=None, status=None):
-    # try:
+    try:
         if tittle is not None:
             Message.query.filter_by(chat_id_applicant=chat_id_applicant, title="none").all()[0].title = tittle
             db.session.flush()
@@ -66,7 +66,7 @@ def message_add(chat_id_applicant, tittle=None, message=None, status=None):
             Message.query.filter_by(chat_id_applicant=chat_id_applicant, status="none").all()[0].status = status
             db.session.flush()
             db.session.commit()
-    # except:
+    except:
         db.session.rollback()
         print("Ошибка добавления в БД")
 
