@@ -49,8 +49,5 @@ valid_subject = {"course": course_n, "subject": subject_n}
 subject_array_selected = []
 
 
-
-
-
 if __name__ == '__main__':
     executor.start_polling(dp)

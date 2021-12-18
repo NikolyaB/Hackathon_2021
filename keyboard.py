@@ -1,5 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
 
+
 def main_menu():
     fourm = InlineKeyboardButton(text="Фоурм")
     ask_a_question = InlineKeyboardButton(text="Задать вопрос")
