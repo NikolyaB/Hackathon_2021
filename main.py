@@ -4,9 +4,8 @@ from aiogram.dispatcher import Dispatcher
 
 import data_base
 import keyboard
-import rating
 
-TOKEN = '2074633156:AAFx1hqXASCnjtXBC1_FDFGhJp8pIOmPZW4'
+TOKEN = '5059252399:AAFRQIZffaX11dO1NQ9D6uAwAJ-TBxnGa7U'
 TelegramBot = Bot(token=TOKEN)
 dp = Dispatcher(TelegramBot)
 db = data_base
@@ -53,19 +52,20 @@ async def send_answer(msg: types.Message):
 
     ''' главное меню пользователя '''
     if stage == "menu":
-        if msg.text == "Задать вопрос":
+        if msg.text == "🤔Задать вопрос":
             await msg.answer(text="Категории", reply_markup=keyboard.all_questions_answer(action="questions"))
-        if msg.text == "Ответить на вопросы":
+        if msg.text == "💡Ответить на вопросы":
             await msg.answer(text="Категории", reply_markup=keyboard.all_questions_answer(action="answers"))
-        if msg.text == "Мои вопросы":
+        if msg.text == "Мои вопросы📰":
             await msg.answer(text="Вопросы", reply_markup=keyboard.my_questions())
-        if msg.text == "Мои ответы":
+        if msg.text == "Мои ответы🧾":
             await msg.answer(text="Ваши ответы", reply_markup=keyboard.user_answer(chat_id_respondent=chat_id,
                                                                                    status="send", action="QuestionAnswer"))
-        if msg.text == "Форум":
+        if msg.text == "👥Форум":
             await msg.answer(text="Форум", reply_markup=keyboard.all_questions_answer(action="forum"))
-        if msg.text == "Рейтинг":
-            await msg.answer(text=f"➖Рейтинг Лучших➖\n{rating.rating()}")
+        if msg.text == "Рейтинг🏆":
+            import rating
+            await msg.answer(text=f"➖Рейтинг Лучших➖\n{rating.show_rating()}")
 
     elif stage == "questions_title":
         global title
@@ -105,7 +105,7 @@ async def process_callback_kb1btn1(call: types.CallbackQuery):
     if call.data and call.data.startswith("cancel"):
         cancel = call.data
         chat_id = call.from_user.id
-
+        data_base.stage(chat_id=chat_id, stage="menu")
         if cancel == "cancel":
             await call.bot.delete_message(chat_id=chat_id, message_id=call.message.message_id)
 
@@ -123,22 +123,25 @@ async def process_callback_kb1btn1(call: types.CallbackQuery):
         for item in array:
             if item == category:
                 if action == "questions":
-                    await call.bot.send_message(chat_id=chat_id, text="Введите заголовок вопроса")
+                    await call.bot.send_message(chat_id=chat_id, text="Введите заголовок вопроса",
+                                                reply_markup=keyboard.cancel())
                     data_base.stage(chat_id=chat_id, stage="questions_title")
                     data_base.generation_message(chat_id_applicant=chat_id, category=category,
                                                  title="none", message="none", status="none")
         for item in array:
             if item == category:
                 if action == "answers":
-                    print(action)
+                    print(item)
                     await call.bot.send_message(chat_id=chat_id, text="Выберете вопрос",
-                                                reply_markup=keyboard.user_all_questions(item, "wait", point="allquestions"))
+                                                reply_markup=keyboard.user_all_questions(category=category, status="wait",
+                                                                                         point="allquestions"))
         for item in array:
             if item == category:
                 if action == "forum":
                     print(action)
                     await call.bot.send_message(chat_id=chat_id, text="Выберете вопрос",
-                                                reply_markup=keyboard.user_all_questions(item, "send", point="forum"))
+                                                reply_markup=keyboard.user_all_questions(item, "send",
+                                                                                         point="forum"))
 
 
 @dp.callback_query_handler(text_contains=['allquestions_'])
@@ -273,7 +276,7 @@ async def process_callback_kb1btn1(call: types.CallbackQuery):
         print(call.data.split("_"))
         action = call.data.split("_")[1]
         if action != "like" and action != "dislike":
-            title = call.data.split("_")[3]
+            title = call.data.split("_")[2]
         if len(call.data.split("_")) == 3:
             id = call.data.split("_")[2]
         else:
@@ -284,12 +287,14 @@ async def process_callback_kb1btn1(call: types.CallbackQuery):
             await call.bot.send_message(chat_id=chat_id, text="Вопрос удален")
 
         if action == "answ":
-            await call.bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
-                                             text="Введите ответ")
+            await call.bot.edit_message_reply_markup(chat_id=chat_id, message_id=call.message.message_id,
+                                             reply_markup=keyboard.cancel())
             data_base.message_add(chat_id_respondent=chat_id, id=id)
             db.stage(chat_id=chat_id, stage="answer")
 
         if action == "complaint":
+            print(title)
+            print(id)
             data_base.message_change_status(title=title, id=id, stat="block")
             await call.bot.edit_message_text(chat_id=chat_id, message_id=call.message.message_id,
                                              text="Жалоба отправлена")
@@ -307,8 +312,7 @@ async def process_callback_kb1btn1(call: types.CallbackQuery):
                                              message_id=call.message.message_id,
                                              text=f"Вопрос: \n{message_question}\n\n"
                                                   f"Ответ: \n{message_answer}\n",
-                                             reply_markup=keyboard.message_menu("forum_back",
-                                                                                like=message_like,
+                                             reply_markup=keyboard.message_menu(like=message_like,
                                                                                 dislike=message_dislike,
                                                                                 message_id=id))
         if action == "like":
@@ -323,11 +327,10 @@ async def process_callback_kb1btn1(call: types.CallbackQuery):
 
 @dp.callback_query_handler(text_contains=['forum_'])
 async def process_callback_kb1btn1(call: types.CallbackQuery):
-    global id, action, message_id, category_back
+    global id, action, message_id, category_back, title
     if call.data and call.data.startswith("forum_"):
         chat_id = call.from_user.id
         print(call.data.split("_"))
-        back = call.data.split("_")[1]
         category = call.data.split("_")[1]
         if len(call.data.split("_")) == 2:
             category_back = call.data.split("_")[1]
@@ -350,14 +353,9 @@ async def process_callback_kb1btn1(call: types.CallbackQuery):
                                                  text=f"Вопрос: \n{message_question}\n\n"
                                                       f"Ответ: \n{message_answer}\n",
                                                  message_id=call.message.message_id,
-                                                 reply_markup=keyboard.message_menu("forum_back", category=category,
-                                                                                    like=message_like,
+                                                 reply_markup=keyboard.message_menu(like=message_like,
                                                                                     dislike=message_dislike,
+                                                                                    title=title,
                                                                                     message_id=message_id))
-        if back == "back":
-            await call.bot.edit_message_text(chat_id=chat_id,
-                                             message_id=call.message.message_id,
-                                             text="Выберете вопрос",
-                                             reply_markup=keyboard.user_all_questions(category_back, "send", point="forum"))
 if __name__ == '__main__':
     executor.start_polling(dp)

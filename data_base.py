@@ -21,6 +21,13 @@ class Users(db.Model):
         return f"<users {self.id}>"
 
 
+# class LikeDislike(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     message_id = db.Column(db.Integer)
+#     chat_id = db.Column(db.Integer)
+#     status = db.Column(db.Integer)
+
+
 class Stage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     chat_id = db.Column(db.Integer, unique=True)

@@ -4,17 +4,16 @@ import data_base
 
 
 def main_menu():
-    fourm = InlineKeyboardButton(text="Форум")
-    ask_a_question = InlineKeyboardButton(text="Задать вопрос")
-    answer_the_questions = InlineKeyboardButton(text="Ответить на вопросы")
-    my_questions = InlineKeyboardButton(text="Мои вопросы")
-    my_answers = InlineKeyboardButton(text="Мои ответы")
-    rating = InlineKeyboardButton(text="Рейтинг")
-    main_menu = InlineKeyboardButton(text="Меню")
+    fourm = InlineKeyboardButton(text="👥Форум")
+    ask_a_question = InlineKeyboardButton(text="🤔Задать вопрос")
+    answer_the_questions = InlineKeyboardButton(text="💡Ответить на вопросы")
+    my_questions = InlineKeyboardButton(text="Мои вопросы📰")
+    my_answers = InlineKeyboardButton(text="Мои ответы🧾")
+    rating = InlineKeyboardButton(text="Рейтинг🏆")
     menu = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2).add(ask_a_question, my_questions,
                                                                       answer_the_questions,
                                                                       my_answers,
-                                                                      fourm, rating, main_menu)
+                                                                      fourm, rating)
     return menu
 
 
@@ -26,9 +25,7 @@ def all_questions_answer(action=None):
     administration = InlineKeyboardButton("Администрирование", callback_data="category_админ_"+action)
     information_security = InlineKeyboardButton("ИБ", callback_data="category_иб_"+action)
     design = InlineKeyboardButton("Дизайн", callback_data="category_дизайн_"+action)
-    formulation = InlineKeyboardButton("Описание категории", callback_data="category_"+action)
     questions.add(development, testing,analytics, administration, information_security, design)
-    questions.row(formulation)
     return questions
 
 
@@ -70,9 +67,15 @@ def user_all_questions(category, status, point):
         data_base.Message.id).all()
     message_title = data_base.Message.query.filter_by(category=category, status=status).with_entities(
         data_base.Message.title).all()
-    for i in range(len(message)):
-        questions.add(InlineKeyboardButton(message_title[i][0],
-                                           callback_data=f"{point}_{category}_{message_title[i][0]}_{message_id[i][0]}"))
+    if len(message) != 0:
+        for i in range(len(message)):
+            print(message_title[i][0])
+            print(message_id[i][0])
+            questions.add(InlineKeyboardButton(message_title[i][0],
+                                               callback_data=f"{point}_{category}_{message_title[i][0]}_{message_id[i][0]}"))
+    else:
+        empty = InlineKeyboardButton("Пусто", callback_data="cancel")
+        questions.add(empty)
     return questions
 
 
@@ -94,15 +97,20 @@ def answer_on_message(title, id):
     return msg
 
 
-def message_menu(point, message_id=None, like=None, dislike=None, category=None):
+def message_menu(message_id=None, title=None, like=None, dislike=None):
     menu = InlineKeyboardMarkup(row_width=1)
-    if category is not None:
-        back = InlineKeyboardButton("Назад", callback_data=f"{point}_{category}")
-    else:
-        back = InlineKeyboardButton("Назад", callback_data=point)
+    complaint = InlineKeyboardButton("Жалоба", callback_data=f"message_complaint_{title}_{message_id}")
+    cancel = InlineKeyboardButton("Закрыть", callback_data="cancel")
     if like is not None or dislike:
         like = InlineKeyboardButton(f"👍 {like}", callback_data=f"message_like_{message_id}")
         dislike = InlineKeyboardButton(f"👎 {dislike}", callback_data=f"message_dislike_{message_id}")
         menu.row(like, dislike)
-    menu.add(back)
+    menu.add(cancel, complaint)
+    return menu
+
+
+def cancel():
+    menu = InlineKeyboardMarkup(row_width=1)
+    cancel = InlineKeyboardButton("❌Отменить❌", callback_data="cancel")
+    menu.add(cancel)
     return menu
