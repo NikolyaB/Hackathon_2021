@@ -33,7 +33,8 @@ class Message(db.Model):
     chat_id_respondent = db.Column(db.Integer)
     category = db.Column(db.String(50))
     title = db.Column(db.String(50))
-    message = db.Column(db.String(500))
+    message_question = db.Column(db.String(500))
+    message_answer = db.Column(db.String(500))
     like = db.Column(db.Integer, default=0)
     dislike = db.Column(db.Integer, default=0)
     status = db.Column(db.String(10))
@@ -43,7 +44,7 @@ def generation_message(chat_id_applicant, category, title, message, status):
     try:
         message = Message(chat_id_applicant=chat_id_applicant,
                           category=category, title=title,
-                          message=message, status=status)
+                          message_question=message, status=status)
         db.session.add(message)
         db.session.flush()
         db.session.commit()
@@ -52,27 +53,44 @@ def generation_message(chat_id_applicant, category, title, message, status):
         print("Ошибка добавления в БД")
 
 
-def message_add(chat_id_applicant, tittle=None, message=None, status=None):
+def message_add(chat_id_applicant=None, id=None, chat_id_respondent=None,  tittle=None, message_question=None, message_answ=None, status=None):
     try:
         if tittle is not None:
             Message.query.filter_by(chat_id_applicant=chat_id_applicant, title="none").all()[0].title = tittle
             db.session.flush()
             db.session.commit()
-        if message is not None:
-            Message.query.filter_by(chat_id_applicant=chat_id_applicant, message="none").all()[0].message = message
+        if message_question is not None:
+            Message.query.filter_by(chat_id_applicant=chat_id_applicant, message_question="none").all()[0].message_question = message_question
             db.session.flush()
             db.session.commit()
-        if status is not None:
+        if status is not None and chat_id_applicant is not None:
             Message.query.filter_by(chat_id_applicant=chat_id_applicant, status="none").all()[0].status = status
             db.session.flush()
             db.session.commit()
+        if chat_id_respondent is not None and id is not None:
+            Message.query.filter_by(id=id, status="wait").all()[0].chat_id_respondent = chat_id_respondent
+        if message_answ is not None and chat_id_respondent is not None:
+            Message.query.filter_by(chat_id_respondent=chat_id_respondent, status="wait").all()[0].message_answer = message_answ
+            Message.query.filter_by(chat_id_respondent=chat_id_respondent, status="wait").all()[0].status = status
     except:
         db.session.rollback()
         print("Ошибка добавления в БД")
 
-def delete_message(title, chat_id_applicant):
+
+def message_change_status(title, id, stat):
     try:
-        Message.query.filter_by(title=title, chat_id_applicant=chat_id_applicant).delete()
+        print(id)
+        Message.query.filter_by(title=title, id=id).all()[0].status = stat
+        db.session.flush()
+        db.session.commit()
+    except:
+        db.session.rollback()
+        print("Ошибка в изменении статуса")
+
+
+def delete_message(id, chat_id_applicant):
+    try:
+        Message.query.filter_by(id=id, chat_id_applicant=chat_id_applicant).delete()
         db.session.flush()
         db.session.commit()
     except:
@@ -151,6 +169,21 @@ def change_status_user(chat_id, status):
         print("Ошибка добавления в БД")
 
 
+def like_dislike_message(id, like=None, dislike=None):
+    try:
+        if like is not None:
+            Message.query.filter_by(id=id).all()[0].like += 1
+            db.session.flush()
+            db.session.commit()
+        if dislike is not None:
+            Message.query.filter_by(id=id).all()[0].dislike += 1
+            db.session.flush()
+            db.session.commit()
+    except:
+        db.session.rollback()
+        print("Ошибка добавления в БД")
+
+
 def like_dislike_user(chat_id, like=None, dislike=None):
     try:
         if like is not None:
@@ -158,13 +191,12 @@ def like_dislike_user(chat_id, like=None, dislike=None):
             db.session.flush()
             db.session.commit()
         if dislike is not None:
-            Users.query.filter_by(chat_id=chat_id).all()[0].like += 1
+            Users.query.filter_by(chat_id=chat_id).all()[0].dislike += 1
             db.session.flush()
             db.session.commit()
     except:
         db.session.rollback()
         print("Ошибка добавления в БД")
-
 
 def counter_answer(chat_id):
     try:
