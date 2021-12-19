@@ -15,6 +15,7 @@ class Users(db.Model):
     like = db.Column(db.Integer, default=0)
     dislike = db.Column(db.Integer, default=0)
     counter_answer = db.Column(db.Integer, default=0)
+    positive_rating = db.Column(db.Float, default=0)
 
     def __repr__(self):
         return f"<users {self.id}>"
@@ -32,7 +33,7 @@ class Message(db.Model):
     chat_id_applicant = db.Column(db.Integer)
     chat_id_respondent = db.Column(db.Integer)
     category = db.Column(db.String(50))
-    title = db.Column(db.String(50))
+    title = db.Column(db.String(100))
     message_question = db.Column(db.String(500))
     message_answer = db.Column(db.String(500))
     like = db.Column(db.Integer, default=0)
@@ -184,14 +185,24 @@ def like_dislike_message(id, like=None, dislike=None):
         print("Ошибка добавления в БД")
 
 
-def like_dislike_user(chat_id, like=None, dislike=None):
+def positive_rating(chat_id, pr):
     try:
-        if like is not None:
-            Users.query.filter_by(chat_id=chat_id).all()[0].like += 1
+        Users.query.filter_by(chat_id=chat_id).order_by(Users.positive_rating)[0].positive_rating = pr
+        db.session.flush()
+        db.session.commit()
+    except:
+        db.session.rollback()
+        print("Ошибка добавления в БД")
+
+
+def like_dislike_user(chat_id, likes=None, dislikes=None):
+    try:
+        if likes is not None:
+            Users.query.filter_by(chat_id=chat_id).all()[0].like = likes
             db.session.flush()
             db.session.commit()
-        if dislike is not None:
-            Users.query.filter_by(chat_id=chat_id).all()[0].dislike += 1
+        if dislikes is not None:
+            Users.query.filter_by(chat_id=chat_id).all()[0].dislike = dislikes
             db.session.flush()
             db.session.commit()
     except:
